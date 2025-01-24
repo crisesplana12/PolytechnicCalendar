@@ -1,0 +1,32 @@
+# filepath: /c:/Users/acer/Desktop/PolyCal/PolyCalendar/Polytechnic.py
+import sqlite3
+
+DATABASE_NAME = 'polytechnic.db'
+
+def add_highlighted_date(date):
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO highlighted_dates (date) VALUES (?)
+    ''', (date,))
+    conn.commit()
+    conn.close()
+
+def fetch_highlighted_dates():
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT date FROM highlighted_dates
+    ''')
+    dates = cursor.fetchall()
+    conn.close()
+    return [date[0] for date in dates]
+
+def delete_highlighted_date(date):
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+        DELETE FROM highlighted_dates WHERE date = ?
+    ''', (date,))
+    conn.commit()
+    conn.close()

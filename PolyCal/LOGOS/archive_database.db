@@ -1,0 +1,47 @@
+import sqlite3
+
+DATABASE_NAME = 'archive.db'
+
+def create_tables():
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS archived_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            date TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS archived_notes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            date TEXT NOT NULL,
+            username TEXT NOT NULL
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+def fetch_archived_events_by_date(event_date):
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT title FROM archived_events WHERE date = ?
+    ''', (event_date,))
+    events = cursor.fetchall()
+    conn.close()
+    return events
+
+def fetch_archived_notes_by_date(note_date, username):
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT title FROM archived_notes WHERE date = ? AND username = ?
+    ''', (note_date, username))
+    notes = cursor.fetchall()
+    conn.close()
+    return notes
+
+# Call create_tables() at the start of your application
+create_tables()

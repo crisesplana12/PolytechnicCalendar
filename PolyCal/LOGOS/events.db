@@ -1,0 +1,84 @@
+import sqlite3
+import os
+from tkinter import messagebox
+
+DATABASE_NAME = 'events.db'
+
+# Define the init_db function
+def init_db():
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    # Create events table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS events (
+            id INTEGER PRIMARY KEY,
+            date TEXT NOT NULL,
+            title TEXT NOT NULL,
+            description TEXT,
+            image BLOB,
+            highlight_color TEXT
+        )
+    ''')
+    # Create notes table with username
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS notes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL,
+            title TEXT NOT NULL,
+            content TEXT,
+            username TEXT NOT NULL,
+            highlight_color TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+def insert_event(event_date, event_title, event_description, event_image, highlight_color=None):
+    try:
+        conn = sqlite3.connect(DATABASE_NAME)
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO events (date, title, description, image, highlight_color) VALUES (?, ?, ?, ?, ?)
+        ''', (event_date, event_title, event_description, event_image, highlight_color))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"An error occurred: {e}")
+    finally:
+        conn.close()
+
+def insert_note(note_date, note_title, note_content):
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO notes (date, title, content) VALUES (?, ?, ?)
+    ''', (note_date, note_title, note_content))
+    conn.commit()
+    conn.close()
+
+def fetch_events_by_date(event_date):
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT title FROM events WHERE date = ?
+    ''', (event_date,))
+    events = cursor.fetchall()
+    conn.close()
+    return events
+
+def fetch_notes_by_date(note_date):
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT title, content FROM notes WHERE date = ?
+    ''', (note_date,))
+    notes = cursor.fetchall()
+    conn.close()
+    return notes
+
+# Initialize the database
+init_db()
+
+# Insert a sample event
+insert_event('2023-10-10', 'Sample Event', 'This is a sample event description.', None)
+
+# Fetch events for a
